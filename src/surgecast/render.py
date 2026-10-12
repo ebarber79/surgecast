@@ -6,7 +6,7 @@ import numpy as np
 
 from .sim import EpisodeResult
 
-STATE_COLORS = {"surge": "#d62728", "cast": "#1f77b4", "search": "#7f7f7f", "climb": "#2ca02c"}
+STATE_COLORS = {"surge": "#d62728", "cast": "#1f77b4", "search": "#7f7f7f", "climb": "#2ca02c", "recover": "#ff7f0e"}
 
 
 def _setup(res: EpisodeResult):

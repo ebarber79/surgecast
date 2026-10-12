@@ -62,6 +62,11 @@ class SurgeCast:
     "Upwind" uses the wind averaged over `wind_tau` seconds (see `WindMemory`). `cast_upwind`
     is how much upwind progress to keep while casting. Above ~0.2 the agent starts
     overshooting the source, and nothing upwind of the source ever smells of anything.
+
+    `recover_after` (off by default) handles overshoot in confined spaces: once the odor has
+    been lost for that many seconds, casting drifts downwind (`recover`) instead of upwind.
+    Indoors there is a wall or the fan right behind the source, so an overshoot otherwise pins
+    the searcher there. In open air it costs time, because long losses are common there too.
     """
 
     name = "surgecast"
@@ -74,6 +79,8 @@ class SurgeCast:
         max_leg: float = 10.0,
         wind_tau: float = 10.0,
         cast_upwind: float = 0.2,
+        recover_after: float | None = None,
+        recover: float = 0.3,
     ):
         self.surge_time = surge_time
         self.cast_leg = cast_leg
@@ -81,6 +88,8 @@ class SurgeCast:
         self.max_leg = max_leg
         self.wind_tau = wind_tau
         self.cast_upwind = cast_upwind
+        self.recover_after = recover_after
+        self.recover = recover
 
     def reset(self, rng: np.random.Generator) -> None:
         self.rng = rng
@@ -106,7 +115,9 @@ class SurgeCast:
             self.state = "surge"
             return upwind
 
-        self.state = "cast"
+        # Only after a real contact: before the first hit there is nothing to have overshot.
+        lost_long = self.recover_after is not None and np.isfinite(since) and since > self.recover_after
+        self.state = "recover" if lost_long else "cast"
         self.leg_t += dt
         if self.leg_t >= self.leg_len:
             self.leg_t = 0.0
@@ -114,7 +125,8 @@ class SurgeCast:
             # After the opening half leg, legs start at full length and then widen.
             grown = self.cast_leg if self.leg_len < self.cast_leg else self.leg_len * self.cast_growth
             self.leg_len = min(grown, self.max_leg)
-        return _unit(self.cast_dir * crosswind + self.cast_upwind * upwind)
+        bias = -self.recover if lost_long else self.cast_upwind
+        return _unit(self.cast_dir * crosswind + bias * upwind)
 
 
 class UpwindOnly:

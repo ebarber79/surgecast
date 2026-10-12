@@ -68,6 +68,28 @@ res = run_episode("surgecast", seed=0, plume_cfg=PlumeConfig(meander_sigma=0.5))
 res.success, res.time, res.path
 ```
 
+## Handheld guide (v1, in progress)
+
+The same logic, packaged as a device you carry: a gas sensor, a wind vane and an IMU tell it
+what you smell and which way the air moves, and it tells you which way to walk. Parts, wiring
+and what the simulation says about the design are in [`docs/hardware.md`](docs/hardware.md).
+Until the parts arrive, `surgecast guide` runs the whole software path on a simulated device
+in an indoor fan plume, with a slow gas sensor and a person reacting to the instructions:
+
+```
+$ surgecast guide --seed 3
+   0.0s  CAST     Lost it. Walk across the wind, wind on your right (turn left 87°)
+   0.3s  SURGE    Odor! Walk into the wind
+   2.9s  CAST     Lost it. Walk across the wind, wind on your right (turn left 78°)
+   ...
+simulated walker reached the source in 11.3s
+
+$ surgecast guide --trials 50
+simulated handheld guide: 100% found source, median 15.1s (50 trials, sensor tau 2.0s, reaction 0.7s)
+```
+
+![simulated walker following the guide](docs/guide.png)
+
 ## The model
 
 - **Plume** (`plume.py`): puffs leave the source at 5/s, ride a wind whose direction wanders
@@ -79,9 +101,9 @@ res.success, res.time, res.path
 
 ## Roadmap
 
-- v0 (this): simulation, three agents, benchmark, plots.
-- v1: hardware. Feed a real gas sensor (MQ-series/BME688) and a wind vane into the same agent
-  API as a handheld "which way?" guide.
+- v0: simulation, three agents, benchmark, plots.
+- v1 (in progress): handheld guide. Done: rise detector, guide, simulated device, logging.
+  Next: sensor drivers and live mode once the parts arrive ([`docs/hardware.md`](docs/hardware.md)).
 - Later: several cheap nodes that share hits (the firefly half of the idea map; see
   [`ideas.md`](ideas.md)).
 
