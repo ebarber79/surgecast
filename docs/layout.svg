@@ -70,6 +70,6 @@
     <text x="40" y="540">• Gas sensor on a ~20 cm forward boom: sampling air before the body and your hand disturb it, and away from the Pi's heat.</text>
     <text x="40" y="558">• Vane on a mast above everything, so it reads the free stream, not the wake of the body or your arm.</text>
     <text x="40" y="576">• IMU rigid on the body, aligned with the forward axis; gyro-only mode, so the vane magnet can't upset it.</text>
-    <text x="40" y="594">• Vibration motor in the handle: cues are felt instantly, which matters more than sensor speed (see hardware.md).</text>
+    <text x="40" y="594">• Vibration motor in the handle, driven by a DRV2605L on the same I²C chain: cues are felt instantly, which matters more than sensor speed.</text>
   </g>
 </svg>

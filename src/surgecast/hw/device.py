@@ -2,8 +2,8 @@
 
 Hardware plugs in through two small interfaces. A `SensorSource` yields `Reading`s at the
 loop rate (real drivers block until the next sample is due; `ReplaySource` plays back a
-logged session). A `Feedback` renders cues. `TerminalFeedback` prints them, and the buzzer
-will render the same patterns.
+logged session). A `Feedback` renders cues. `TerminalFeedback` prints them, and the DRV2605L
+haptic driver will play the same patterns on the vibration motor.
 """
 
 from __future__ import annotations
