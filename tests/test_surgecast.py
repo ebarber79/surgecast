@@ -33,7 +33,18 @@ def test_surgecast_surges_upwind_on_detection_then_casts_crosswind():
     h = agent.act(Observation(0.0, pos, wind, 1.0, True), 0.1)
     assert agent.state == "surge" and np.allclose(h, [-1.0, 0.0])
     h = agent.act(Observation(5.0, pos, wind, 0.0, False), 0.1)
-    assert agent.state == "cast" and np.allclose(abs(h[1]), 1.0)
+    # Mostly crosswind, edging upwind.
+    assert agent.state == "cast" and abs(h[1]) > 0.9 and h[0] < 0
+
+
+def test_surge_follows_averaged_wind_not_the_latest_gust():
+    agent = AGENTS["surgecast"](wind_tau=10.0)
+    agent.reset(np.random.default_rng(0))
+    steady, gust = np.array([1.0, 0.0]), np.array([0.0, 1.0])
+    for i in range(200):
+        agent.act(Observation(i * 0.1, np.zeros(2), steady, 1.0, True), 0.1)
+    h = agent.act(Observation(20.0, np.zeros(2), gust, 1.0, True), 0.1)
+    assert agent.state == "surge" and h[0] < -0.95
 
 
 def test_cast_legs_alternate_and_widen():
