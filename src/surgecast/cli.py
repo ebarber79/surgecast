@@ -68,7 +68,26 @@ def cmd_bench(args) -> int:
     return 0
 
 
+def cmd_replay(args) -> int:
+    from .hw.detect import OdorSignal
+    from .hw.device import ReplaySource, TerminalFeedback, run_live
+    from .hw.guide import Guide
+
+    src = ReplaySource(args.replay, realtime=args.realtime)
+    r_clean = args.r_clean or (float(src.meta["r_clean"]) if "r_clean" in src.meta else None)
+    seed = int(src.meta.get("seed", args.seed))
+    guide = Guide(seed=seed, signal=OdorSignal(r_clean=r_clean))
+    print(f"replaying {args.replay}: {len(src.readings)} readings, "
+          f"clean-air baseline {f'{r_clean:.0f} ohm' if r_clean else 'from first reading'}")
+    ins = run_live(src, guide, TerminalFeedback(), log_path=args.log, r_clean=r_clean, seed=seed)
+    print(f"{len(ins)} steps, {sum(i.detected for i in ins)} odor onsets detected")
+    return 0
+
+
 def cmd_guide(args) -> int:
+    if args.replay:
+        return cmd_replay(args)
+    from .hw.device import CUES, Cuer
     from .hw.simdevice import DeviceSimConfig, run_device_episode
 
     cfg = DeviceSimConfig(sensor_tau=args.sensor_tau, reaction=args.reaction)
@@ -84,18 +103,18 @@ def cmd_guide(args) -> int:
     if args.out:
         record_every = 3 if args.out.endswith(".gif") else 1
     run = run_device_episode(args.seed, cfg, record_every=record_every)
-    last = None
+    print("cues: " + " | ".join(f"{c.pattern} {c.name}" for c in CUES.values()))
+    cuer = Cuer()
     for ins in run.instructions:
-        if ins.state != last:
-            print(f"{ins.t:6.1f}s  {ins.state.upper():<7}  {ins.text}")
-            last = ins.state
+        if cue := cuer.update(ins):
+            print(f"{ins.t:7.1f}s  {cue.pattern:<4} {cue.name.upper():<8} {ins.text}")
     res = run.result
     outcome = f"reached the source in {res.time:.1f}s" if res.success else f"timed out at {res.time:.0f}s"
     print(f"simulated walker {outcome}")
     if args.log:
         from .hw.log import write_csv
 
-        write_csv(args.log, run.readings, run.instructions)
+        write_csv(args.log, run.readings, run.instructions, r_clean=cfg.r_clean, seed=args.seed)
         print(f"wrote {args.log}")
     if args.out:
         try:
@@ -131,13 +150,16 @@ def main(argv: list[str] | None = None) -> int:
     _add_env_args(b)
     b.set_defaults(func=cmd_bench)
 
-    g = sub.add_parser("guide", help="handheld guide on a simulated device in an indoor fan plume")
+    g = sub.add_parser("guide", help="handheld guide: simulated device in an indoor fan plume, or --replay a log")
     g.add_argument("--seed", type=int, default=0)
     g.add_argument("--trials", type=int, default=1, help=">1 prints a success summary instead")
     g.add_argument("--sensor-tau", type=float, default=2.0, help="gas sensor response time, s")
     g.add_argument("--reaction", type=float, default=0.7, help="walker reaction delay, s")
     g.add_argument("--log", help="write readings and instructions to CSV")
     g.add_argument("--out", help="write a .png plot or .gif animation")
+    g.add_argument("--replay", metavar="CSV", help="replay a logged session through the live loop")
+    g.add_argument("--realtime", action="store_true", help="replay at recorded speed")
+    g.add_argument("--r-clean", type=float, help="override the clean-air resistance for replay, ohm")
     g.set_defaults(func=cmd_guide)
 
     args = ap.parse_args(argv)

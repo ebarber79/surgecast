@@ -64,3 +64,43 @@ def test_cli_guide(capsys):
 
     assert main(["guide", "--seed", "1"]) == 0
     assert "simulated walker" in capsys.readouterr().out
+
+
+def test_replay_through_live_loop_reproduces_the_session(tmp_path):
+    from surgecast.hw import Guide, ReplaySource, run_live
+    from surgecast.hw.log import write_csv
+
+    run = run_device_episode(3)
+    path = tmp_path / "s.csv"
+    write_csv(str(path), run.readings, run.instructions, r_clean=50_000, seed=3)
+    src = ReplaySource(str(path))
+    assert src.meta == {"r_clean": "50000", "seed": "3"}
+    guide = Guide(seed=3, signal=OdorSignal(r_clean=50_000))
+    replayed = run_live(src, guide, log_path=str(tmp_path / "again.csv"))
+    # Logged values are rounded, so compare decisions, not floats.
+    assert [i.state for i in replayed] == [i.state for i in run.instructions]
+    assert (tmp_path / "again.csv").read_text().count("\n") == len(run.readings) + 1
+
+
+def test_cuer_cues_only_on_changes():
+    from surgecast.hw import Cuer
+    from surgecast.hw.guide import Instruction
+
+    def ins(state, turn, side="left"):
+        return Instruction(0.0, state, 0.0, turn, f"x wind on your {side}", 0.0, False)
+
+    c = Cuer()
+    cues = [c.update(i) for i in [ins("surge", 0), ins("surge", 0), ins("cast", 1.2, "right"),
+                                  ins("cast", 0.1, "right"), ins("cast", -1.2, "left")]]
+    assert [x.name if x else None for x in cues] == ["surge", None, "left", None, "right"]
+
+
+def test_cli_replay(tmp_path, capsys):
+    from surgecast.cli import main
+
+    log = tmp_path / "s.csv"
+    assert main(["guide", "--seed", "3", "--log", str(log)]) == 0
+    capsys.readouterr()
+    assert main(["guide", "--replay", str(log)]) == 0
+    out = capsys.readouterr().out
+    assert "clean-air baseline 50000 ohm" in out and "SURGE" in out
