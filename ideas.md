@@ -31,6 +31,8 @@ here with software and/or cheap hardware (camera, mic, LEDs, a gas sensor).
 
 ## Shortlist (my take)
 
+> **Chosen for v0 (2026-10-11):** #1 surge-cast source finder, software-only sim, open source. See README.
+
 1. **Surge-cast source finder.** Clear real-world use (gas leaks, smells, RF/sound sources), the
    algorithm is well documented in insect literature, and it can start as a simulation on the Pi.
 2. **Leaderless firefly sync.** Useful for distributed jobs/IoT, pure software, easy to demo

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "surgecast"
+version = "0.1.0"
+description = "Moth-style surge-cast odor source search in a simulated turbulent plume"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+render = ["matplotlib>=3.7"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+surgecast = "surgecast.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
