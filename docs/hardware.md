@@ -10,6 +10,15 @@ swab or a dish of vinegar as the source.
  IMU (yaw)  ──┘                                     (tones or vibration, see below)
 ```
 
+## Prototype sketches
+
+How everything combines into one handheld: the wiring on the left, and where each part sits
+and why on the right.
+
+| wiring | physical layout |
+|---|---|
+| [![wiring schematic](schematic.svg)](schematic.svg) | [![physical layout](layout.svg)](layout.svg) |
+
 ## Parts (~$60–80)
 
 | part | what it does | I²C address | notes |
@@ -52,15 +61,15 @@ sensor, noisy vane and IMU, and a person following the instructions with a react
   without odor, the guide backs off downwind while sweeping. Without that, ~1 in 3 simulated
   walks ended pinned behind the source.
 - **Your reaction time matters more than the sensor's.** Going from a 0.7 s to a 1.5 s
-  reaction roughly doubles the search time, while a sensor 4× slower costs only a few seconds.
+  reaction roughly doubles the search time, while a sensor 4× slower (2 s → 8 s) costs ~7 s.
 
 Simulated results, 50 runs each:
 
 | sensor response | reaction 0.7 s | reaction 1.5 s |
 |---|---|---|
-| 1 s | 100%, 14 s | 100%, 25 s |
-| 2 s | 100%, 15 s | 100%, 32 s |
-| 8 s | 100%, 20 s | 100%, 27 s |
+| 1 s | 100%, 14 s | 100%, 28 s |
+| 2 s | 100%, 14 s | 100%, 29 s |
+| 8 s | 100%, 21 s | 98%, 24 s |
 
 ## Feedback
 
@@ -71,8 +80,9 @@ or spoken text can show the details, but shouldn't be what you have to wait for.
 ## Logging
 
 Every session can be saved with `--log session.csv`. The real device will use the same format,
-so a real walk can be replayed through a retuned guide (`surgecast.hw.log.read_readings`) and
-compared with the simulation.
+with the clean-air calibration in the header. `surgecast guide --replay session.csv` runs a log
+back through the same live loop (`surgecast.hw.device.run_live`), so a real walk can be reviewed,
+the detector retuned, and the result compared with the simulation.
 
 ## Still to do when the parts arrive
 
@@ -81,6 +91,7 @@ compared with the simulation.
    resistance.
 3. Measure the BME688's actual response time and achievable sample rate, then tune
    `RiseDetector.threshold` on real logs.
-4. A `surgecast guide --device` mode that runs the loop live with buzzer feedback.
+4. A `surgecast guide --device` mode. The live loop is done (`hw/device.py`); this step adds a
+   `SensorSource` over the three drivers and a buzzer `Feedback` playing the existing cue patterns.
 5. Possible issue: on older Pis, the BNO085 has trouble with I²C clock stretching. If it misbehaves on the
    Pi 5, lower the bus speed or use its UART-RVC mode.

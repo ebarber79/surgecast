@@ -1,0 +1,75 @@
+1
+00:00:00,400 --> 00:00:05,769
+This is surgecast: a handheld guide that
+finds the source of a smell, the way a moth
+
+2
+00:00:05,769 --> 00:00:06,089
+does.
+
+3
+00:00:07,189 --> 00:00:11,113
+A Raspberry Pi reads three sensors on a
+single I²C bus.
+
+4
+00:00:11,463 --> 00:00:15,190
+A gas sensor sits on a forward boom, upwind
+of the Pi's heat.
+
+5
+00:00:15,540 --> 00:00:20,263
+A wind vane on a magnetic angle sensor reads
+which way the air is moving, and an IMU
+
+6
+00:00:20,263 --> 00:00:22,007
+tracks which way you're facing.
+
+7
+00:00:22,357 --> 00:00:26,350
+A motor in the handle buzzes each cue, so
+you feel it instead of reading it.
+
+8
+00:00:27,450 --> 00:00:30,190
+When odor arrives, it tells you to walk into
+the wind.
+
+9
+00:00:30,540 --> 00:00:35,103
+When the odor is lost, it has you cast
+across the wind until you find it again.
+
+10
+00:00:36,203 --> 00:00:40,949
+Here's a simulated walk through a box-fan
+plume, with a slow gas sensor and a person
+
+11
+00:00:40,949 --> 00:00:42,136
+reacting to each cue.
+
+12
+00:00:42,486 --> 00:00:46,816
+Red stretches are surges upwind. Blue
+zigzags are casts across the wind.
+
+13
+00:00:47,166 --> 00:00:51,993
+The slow sensor's level barely changes, so
+the guide fires on odor onsets, the
+
+14
+00:00:51,993 --> 00:00:53,912
+shaded marks, not on the level.
+
+15
+00:00:54,262 --> 00:00:57,930
+In this run, the walker reaches the source
+in about 11 seconds.
+
+16
+00:00:59,030 --> 00:01:03,396
+The design and the simulation are open
+source. The sensors haven't been built yet.

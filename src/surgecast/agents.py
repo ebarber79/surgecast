@@ -21,6 +21,11 @@ class Observation:
     detected: bool
 
 
+# Slack for comparing elapsed times: timestamps that are accumulated (simulation), rounded
+# (logs) or jittered (hardware) shouldn't flip a decision sitting exactly on a boundary.
+_EPS = 1e-6
+
+
 def _unit(v: np.ndarray) -> np.ndarray:
     n = np.linalg.norm(v)
     return v / n if n > 0 else v
@@ -111,7 +116,7 @@ class SurgeCast:
             self.leg_t = 0.0
 
         since = obs.t - self.last_hit
-        if since <= self.surge_time:
+        if since <= self.surge_time + _EPS:
             self.state = "surge"
             return upwind
 
@@ -150,7 +155,7 @@ class UpwindOnly:
         wind = self.wind.update(obs.wind, dt)
         if obs.detected:
             self.last_hit = obs.t
-        if obs.t - self.last_hit <= self.surge_time:
+        if obs.t - self.last_hit <= self.surge_time + _EPS:
             self.state = "surge"
             self.heading = _unit(-wind)
             return self.heading

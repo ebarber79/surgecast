@@ -28,7 +28,7 @@ Same 50 simulated plumes for every strategy (`surgecast bench`):
 | agent | strategy | success | median time |
 |---|---|---|---|
 | `surgecast` | surge upwind on contact, cast crosswind on loss | **98%** | 56 s |
-| `upwind` | surge on contact, random walk on loss (no casting) | 50% | 50 s |
+| `upwind` | surge on contact, random walk on loss (no casting) | 52% | 53 s |
 | `gradient` | klinotaxis: keep heading while concentration rises | 0% | – |
 
 The `upwind` row shows that casting is what makes this work. Surging alone loses the plume and
@@ -37,7 +37,7 @@ rarely finds it again (its median time is lower only because it succeeds just on
 The refinements cut surgecast's median time from 78 s to 56 s on these seeds. The cost is
 one near-miss in 50: a plume so sparse that the agent edged past it to finish level with the
 source but 2.6 m to the side. In snakier wind (`--meander 0.6`) they help across the board,
-raising success from 50% to 80% and cutting the median from 108 s to 73 s. Parameters were
+raising success from 50% to 82% and cutting the median from 108 s to 74 s. Parameters were
 tuned on seeds 100–149, which the benchmark seeds 0–49 don't overlap.
 
 | surgecast | gradient (same plume) |
@@ -72,21 +72,34 @@ res.success, res.time, res.path
 
 The same logic, packaged as a device you carry: a gas sensor, a wind vane and an IMU tell it
 what you smell and which way the air moves, and it tells you which way to walk. Parts, wiring
-and what the simulation says about the design are in [`docs/hardware.md`](docs/hardware.md).
+and what the simulation says about the design are in [`docs/hardware.md`](docs/hardware.md),
+with a [wiring schematic](docs/schematic.svg) and a [layout sketch](docs/layout.svg). A narrated,
+captioned [video of the proposed prototype](docs/video/surgecast-prototype.mp4) shows the 3D model
+and a simulated walk (rebuild it with `scripts/render_video.py`).
 Until the parts arrive, `surgecast guide` runs the whole software path on a simulated device
 in an indoor fan plume, with a slow gas sensor and a person reacting to the instructions:
 
 ```
 $ surgecast guide --seed 3
-   0.0s  CAST     Lost it. Walk across the wind, wind on your right (turn left 87°)
-   0.3s  SURGE    Odor! Walk into the wind
-   2.9s  CAST     Lost it. Walk across the wind, wind on your right (turn left 78°)
+cues: - surge | .. left | ... right | -- recover
+    0.0s  ..   LEFT     Lost it. Walk across the wind, wind on your right (turn left 87°)
+    0.3s  -    SURGE    Odor! Walk into the wind
+    3.0s  ..   LEFT     Lost it. Walk across the wind, wind on your right (turn left 82°)
+    3.5s  -    SURGE    Odor! Walk into the wind
    ...
-simulated walker reached the source in 11.3s
+simulated walker reached the source in 11.0s
 
 $ surgecast guide --trials 50
-simulated handheld guide: 100% found source, median 15.1s (50 trials, sensor tau 2.0s, reaction 0.7s)
+simulated handheld guide: 100% found source, median 14.4s (50 trials, sensor tau 2.0s, reaction 0.7s)
 ```
+
+Cues are patterns you can act on without reading (`-` long buzz, `.` short): `-` odor, walk
+into the wind; `..` / `...` turn left / right and walk across the wind; `--` lost it for a while,
+back off downwind. The buzzer will play the same patterns.
+
+Sessions log to CSV with `--log`. `--replay session.csv` runs a log back through the same live
+loop the device uses (`--realtime` for recorded speed), which is how a real walk will be
+reviewed and the detector retuned.
 
 ![simulated walker following the guide](docs/guide.png)
 
@@ -102,8 +115,9 @@ simulated handheld guide: 100% found source, median 15.1s (50 trials, sensor tau
 ## Roadmap
 
 - v0: simulation, three agents, benchmark, plots.
-- v1 (in progress): handheld guide. Done: rise detector, guide, simulated device, logging.
-  Next: sensor drivers and live mode once the parts arrive ([`docs/hardware.md`](docs/hardware.md)).
+- v1 (in progress): handheld guide. Done: rise detector, guide, simulated device, live loop,
+  cues, logging and replay. Next: sensor drivers and buzzer once the parts arrive
+  ([`docs/hardware.md`](docs/hardware.md)).
 - Later: several cheap nodes that share hits (the firefly half of the idea map; see
   [`ideas.md`](ideas.md)).
 
