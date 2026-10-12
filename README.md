@@ -95,7 +95,7 @@ simulated handheld guide: 100% found source, median 14.4s (50 trials, sensor tau
 
 Cues are patterns you can act on without reading (`-` long buzz, `.` short): `-` odor, walk
 into the wind; `..` / `...` turn left / right and walk across the wind; `--` lost it for a while,
-back off downwind. The buzzer will play the same patterns.
+back off downwind. A vibration motor in the handle will play the same patterns.
 
 Sessions log to CSV with `--log`. `--replay session.csv` runs a log back through the same live
 loop the device uses (`--realtime` for recorded speed), which is how a real walk will be
@@ -116,7 +116,7 @@ reviewed and the detector retuned.
 
 - v0: simulation, three agents, benchmark, plots.
 - v1 (in progress): handheld guide. Done: rise detector, guide, simulated device, live loop,
-  cues, logging and replay. Next: sensor drivers and buzzer once the parts arrive
+  cues, logging and replay. Next: drivers for the sensors and the haptic motor once the parts arrive
   ([`docs/hardware.md`](docs/hardware.md)).
 - Later: several cheap nodes that share hits (the firefly half of the idea map; see
   [`ideas.md`](ideas.md)).

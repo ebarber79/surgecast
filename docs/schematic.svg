@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" width="1000" height="750" font-family="Helvetica, Arial, sans-serif" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="Helvetica, Arial, sans-serif" font-size="13">
   <title>surgecast handheld: wiring schematic</title>
-  <rect width="1000" height="750" fill="#ffffff"/>
+  <rect width="1000" height="700" fill="#ffffff"/>
   <text x="40" y="30" font-size="18" font-weight="bold" fill="#111">surgecast handheld guide · wiring schematic (sketch)</text>
 
   <!-- Raspberry Pi 5 -->
-  <rect x="40" y="200" width="200" height="410" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+  <rect x="40" y="200" width="200" height="270" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
   <text x="140" y="228" text-anchor="middle" font-weight="bold" font-size="15" fill="#1b5e20">Raspberry Pi 5</text>
   <text x="140" y="246" text-anchor="middle" font-size="11" fill="#33691e">40-pin header (I²C bus 1)</text>
   <g font-size="12" fill="#111" text-anchor="end">
@@ -12,16 +12,15 @@
     <text x="232" y="324">pin 3 · GPIO2 SDA</text>
     <text x="232" y="364">pin 5 · GPIO3 SCL</text>
     <text x="232" y="404">pin 6 · GND</text>
-    <text x="232" y="574">pin 12 · GPIO18</text>
   </g>
-  <text x="140" y="598" text-anchor="middle" font-size="11" fill="#33691e">USB-C power in</text>
+  <text x="140" y="455" text-anchor="middle" font-size="11" fill="#33691e">USB-C power in</text>
 
   <!-- Power bank -->
-  <rect x="40" y="660" width="200" height="50" rx="6" fill="#f5f5f5" stroke="#555" stroke-width="2"/>
-  <text x="140" y="682" text-anchor="middle" font-weight="bold">USB-C power bank</text>
-  <text x="140" y="700" text-anchor="middle" font-size="11">5 V, ≥ 3 A</text>
-  <line x1="140" y1="660" x2="140" y2="612" stroke="#555" stroke-width="3"/>
-  <polygon points="134,620 146,620 140,610" fill="#555"/>
+  <rect x="40" y="530" width="200" height="50" rx="6" fill="#f5f5f5" stroke="#555" stroke-width="2"/>
+  <text x="140" y="552" text-anchor="middle" font-weight="bold">USB-C power bank</text>
+  <text x="140" y="570" text-anchor="middle" font-size="11">5 V, ≥ 3 A</text>
+  <line x1="140" y1="530" x2="140" y2="472" stroke="#555" stroke-width="3"/>
+  <polygon points="134,480 146,480 140,470" fill="#555"/>
 
   <!-- Bus rails -->
   <g stroke-width="3" fill="none">
@@ -37,14 +36,14 @@
     <text x="966" y="404" fill="#212121">GND</text>
   </g>
 
-  <!-- Sensor template: box at y 60..190, pins VIN x+30, SDA x+70, SCL x+110, GND x+150 -->
+  <!-- Boards above the rails: pins VIN x+30, SDA x+70, SCL x+110, GND x+150 -->
   <!-- BME688 -->
   <g>
     <rect x="300" y="60" width="180" height="130" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
     <text x="390" y="86" text-anchor="middle" font-weight="bold" font-size="15" fill="#bf360c">BME688</text>
     <text x="390" y="104" text-anchor="middle" font-size="11">gas resistance (odor)</text>
-    <text x="390" y="120" text-anchor="middle" font-size="11">I²C 0x77 (0x76 if jumpered)</text>
-    <text x="390" y="136" text-anchor="middle" font-size="11">STEMMA QT</text>
+    <text x="390" y="120" text-anchor="middle" font-size="11">I²C 0x77 (Adafruit)</text>
+    <text x="390" y="136" text-anchor="middle" font-size="11">0x76 on Pimoroni boards</text>
     <g font-size="10" text-anchor="middle"><text x="330" y="182">VIN</text><text x="370" y="182">SDA</text><text x="410" y="182">SCL</text><text x="450" y="182">GND</text></g>
     <line x1="330" y1="190" x2="330" y2="280" stroke="#d32f2f" stroke-width="2"/>
     <line x1="370" y1="190" x2="370" y2="320" stroke="#1976d2" stroke-width="2"/>
@@ -70,74 +69,62 @@
   </g>
   <!-- AS5600 -->
   <g>
-    <rect x="760" y="60" width="190" height="130" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
-    <text x="855" y="86" text-anchor="middle" font-weight="bold" font-size="15" fill="#4a148c">AS5600 + magnet</text>
-    <text x="855" y="104" text-anchor="middle" font-size="11">wind vane angle</text>
-    <text x="855" y="120" text-anchor="middle" font-size="11">I²C 0x36 (fixed)</text>
-    <text x="855" y="136" text-anchor="middle" font-size="11">set board to 3.3 V!</text>
-    <g font-size="10" text-anchor="middle"><text x="790" y="182">VCC</text><text x="830" y="182">SDA</text><text x="870" y="182">SCL</text><text x="910" y="182">GND</text><text x="938" y="182">DIR</text></g>
+    <rect x="760" y="60" width="180" height="130" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+    <text x="850" y="86" text-anchor="middle" font-weight="bold" font-size="15" fill="#4a148c">AS5600 + magnet</text>
+    <text x="850" y="104" text-anchor="middle" font-size="11">wind vane angle · I²C 0x36</text>
+    <text x="850" y="120" text-anchor="middle" font-size="11">6×2.5 mm diametric magnet</text>
+    <text x="850" y="136" text-anchor="middle" font-size="11">≤ 3 mm above the chip</text>
+    <g font-size="10" text-anchor="middle"><text x="790" y="182">VIN</text><text x="830" y="182">SDA</text><text x="870" y="182">SCL</text><text x="910" y="182">GND</text></g>
     <line x1="790" y1="190" x2="790" y2="280" stroke="#d32f2f" stroke-width="2"/>
     <line x1="830" y1="190" x2="830" y2="320" stroke="#1976d2" stroke-width="2"/>
     <line x1="870" y1="190" x2="870" y2="360" stroke="#f9a825" stroke-width="2"/>
     <line x1="910" y1="190" x2="910" y2="400" stroke="#212121" stroke-width="2"/>
-    <line x1="938" y1="190" x2="938" y2="400" stroke="#212121" stroke-width="2" stroke-dasharray="5 3"/>
     <circle cx="790" cy="280" r="5" fill="#d32f2f"/><circle cx="830" cy="320" r="5" fill="#1976d2"/>
     <circle cx="870" cy="360" r="5" fill="#f9a825"/><circle cx="910" cy="400" r="5" fill="#212121"/>
-    <circle cx="938" cy="400" r="5" fill="#212121"/>
   </g>
-  <text x="300" y="440" font-size="11" fill="#444">Wires that cross a rail without a dot are not connected. All three boards share one I²C bus (distinct addresses).</text>
-  <text x="300" y="456" font-size="11" fill="#444">AS5600 DIR → GND: angle increases clockwise seen from the magnet side. Fix the sign in software calibration.</text>
 
-  <!-- Vibration motor driver on GPIO18 -->
-  <g transform="translate(0,50)">
-  <g stroke="#2e7d32" stroke-width="2" fill="none">
-    <line x1="240" y1="520" x2="330" y2="520"/>
-    <polyline points="330,520 338,510 350,530 362,510 374,530 386,510 398,530 406,520"/>
-    <line x1="406" y1="520" x2="470" y2="520"/>
+  <!-- DRV2605L below the rails: its four wires drop in the free gap between the BME688 and BNO085 -->
+  <g>
+    <rect x="440" y="470" width="230" height="120" rx="8" fill="#fce4ec" stroke="#ad1457" stroke-width="2"/>
+    <g font-size="9" text-anchor="middle"><text x="472" y="486">VIN</text><text x="497" y="486">SDA</text><text x="522" y="486">SCL</text><text x="547" y="486">GND</text></g>
+    <text x="555" y="514" text-anchor="middle" font-weight="bold" font-size="15" fill="#880e4f">DRV2605L</text>
+    <text x="555" y="532" text-anchor="middle" font-size="11">haptic motor driver · I²C 0x5A</text>
+    <text x="555" y="548" text-anchor="middle" font-size="11">ERM mode, built-in effects</text>
+    <text x="555" y="564" text-anchor="middle" font-size="11">or real-time playback</text>
+    <line x1="472" y1="477" x2="472" y2="280" stroke="#d32f2f" stroke-width="2"/>
+    <line x1="497" y1="477" x2="497" y2="320" stroke="#1976d2" stroke-width="2"/>
+    <line x1="522" y1="477" x2="522" y2="360" stroke="#f9a825" stroke-width="2"/>
+    <line x1="547" y1="477" x2="547" y2="400" stroke="#212121" stroke-width="2"/>
+    <circle cx="472" cy="280" r="5" fill="#d32f2f"/><circle cx="497" cy="320" r="5" fill="#1976d2"/>
+    <circle cx="522" cy="360" r="5" fill="#f9a825"/><circle cx="547" cy="400" r="5" fill="#212121"/>
+    <!-- motor outputs -->
+    <g font-size="10" text-anchor="end"><text x="666" y="500">MOTOR +</text><text x="666" y="584">MOTOR −</text></g>
+    <line x1="670" y1="496" x2="760" y2="496" stroke="#7b1fa2" stroke-width="2.5"/>
+    <line x1="760" y1="496" x2="760" y2="512" stroke="#7b1fa2" stroke-width="2.5"/>
+    <line x1="670" y1="580" x2="760" y2="580" stroke="#7b1fa2" stroke-width="2.5"/>
+    <line x1="760" y1="580" x2="760" y2="568" stroke="#7b1fa2" stroke-width="2.5"/>
   </g>
-  <text x="368" y="502" text-anchor="middle" font-size="12">1 kΩ</text>
-  <!-- NPN transistor -->
-  <circle cx="490" cy="520" r="26" fill="none" stroke="#111" stroke-width="2"/>
-  <line x1="476" y1="504" x2="476" y2="536" stroke="#111" stroke-width="3"/>
-  <line x1="470" y1="520" x2="476" y2="520" stroke="#111" stroke-width="2"/>
-  <line x1="476" y1="512" x2="500" y2="494" stroke="#111" stroke-width="2"/>
-  <line x1="476" y1="528" x2="500" y2="546" stroke="#111" stroke-width="2"/>
-  <polygon points="500,546 489,544 495,536" fill="#111"/>
-  <text x="528" y="548" font-size="11">NPN 2N2222</text>
-  <text x="528" y="562" font-size="11">(or logic-level MOSFET)</text>
-  <!-- collector to motor -->
-  <line x1="500" y1="494" x2="500" y2="482" stroke="#111" stroke-width="2"/>
-  <circle cx="500" cy="458" r="22" fill="#fffde7" stroke="#111" stroke-width="2"/>
-  <text x="500" y="463" text-anchor="middle" font-weight="bold">M</text>
-  <text x="440" y="462" text-anchor="end" font-size="11">coin vibration</text>
-  <text x="440" y="476" text-anchor="end" font-size="11">motor 3 V</text>
-  <line x1="500" y1="436" x2="500" y2="424" stroke="#d32f2f" stroke-width="2"/>
-  <text x="500" y="418" text-anchor="middle" font-size="12" font-weight="bold" fill="#d32f2f">3V3</text>
-  <!-- flyback diode -->
-  <line x1="500" y1="428" x2="560" y2="428" stroke="#111" stroke-width="2"/>
-  <line x1="560" y1="428" x2="560" y2="448" stroke="#111" stroke-width="2"/>
-  <polygon points="550,468 570,468 560,450" fill="#111"/>
-  <line x1="549" y1="450" x2="571" y2="450" stroke="#111" stroke-width="3"/>
-  <line x1="560" y1="468" x2="560" y2="488" stroke="#111" stroke-width="2"/>
-  <line x1="560" y1="488" x2="500" y2="488" stroke="#111" stroke-width="2"/>
-  <circle cx="500" cy="488" r="4" fill="#111"/><circle cx="500" cy="428" r="4" fill="#111"/>
-  <text x="578" y="462" font-size="11">1N4148 flyback</text>
-  <!-- emitter to ground -->
-  <line x1="500" y1="546" x2="500" y2="580" stroke="#111" stroke-width="2"/>
-  <line x1="486" y1="580" x2="514" y2="580" stroke="#111" stroke-width="2"/>
-  <line x1="491" y1="586" x2="509" y2="586" stroke="#111" stroke-width="2"/>
-  <line x1="496" y1="592" x2="504" y2="592" stroke="#111" stroke-width="2"/>
-  <text x="520" y="590" font-size="11">GND (Pi)</text>
-  <text x="300" y="625" font-size="11" fill="#444">Never drive the motor straight from the GPIO pin: the transistor switches it, and the diode absorbs the motor's turn-off spike.</text>
-  <text x="300" y="641" font-size="11" fill="#444">The same circuit drives an active piezo buzzer instead (no diode needed). The cue patterns play on GPIO18.</text>
+  <circle cx="760" cy="540" r="28" fill="#fffde7" stroke="#111" stroke-width="2"/>
+  <text x="760" y="545" text-anchor="middle" font-weight="bold">M</text>
+  <text x="798" y="530" font-size="11">vibration</text>
+  <text x="798" y="544" font-size="11">motor disc</text>
+  <text x="798" y="558" font-size="11">(ERM, 2–5 V)</text>
+
+  <!-- Notes -->
+  <g font-size="11" fill="#444">
+    <text x="40" y="618">Wires that cross a rail without a dot are not connected. All four boards share one I²C bus: 0x36, 0x4A, 0x5A, 0x77.</text>
+    <text x="40" y="634">Built physically as a daisy chain of STEMMA QT cables: Pi → BME688 → BNO085 → AS5600 → DRV2605L.</text>
+    <text x="40" y="650">The DRV2605L drives the motor itself: no transistor, resistor or flyback diode. The Pi sends the cue patterns over I²C.</text>
+    <text x="40" y="666">Generic (non-Adafruit) AS5600 boards: set them to 3.3 V and tie DIR to GND.</text>
+    <text x="40" y="682">The BME688 address doesn't matter as long as it differs from the others; the driver will probe both.</text>
   </g>
 
   <!-- Legend -->
-  <g font-size="11" transform="translate(0,40)">
-    <line x1="760" y1="520" x2="790" y2="520" stroke="#d32f2f" stroke-width="3"/><text x="796" y="524">3V3</text>
-    <line x1="760" y1="538" x2="790" y2="538" stroke="#1976d2" stroke-width="3"/><text x="796" y="542">SDA (data)</text>
-    <line x1="760" y1="556" x2="790" y2="556" stroke="#f9a825" stroke-width="3"/><text x="796" y="560">SCL (clock)</text>
-    <line x1="760" y1="574" x2="790" y2="574" stroke="#212121" stroke-width="3"/><text x="796" y="578">GND</text>
-    <line x1="760" y1="592" x2="790" y2="592" stroke="#2e7d32" stroke-width="3"/><text x="796" y="596">GPIO signal</text>
+  <g font-size="11">
+    <line x1="850" y1="430" x2="880" y2="430" stroke="#d32f2f" stroke-width="3"/><text x="886" y="434">3V3</text>
+    <line x1="850" y1="448" x2="880" y2="448" stroke="#1976d2" stroke-width="3"/><text x="886" y="452">SDA (data)</text>
+    <line x1="850" y1="466" x2="880" y2="466" stroke="#f9a825" stroke-width="3"/><text x="886" y="470">SCL (clock)</text>
+    <line x1="850" y1="484" x2="880" y2="484" stroke="#212121" stroke-width="3"/><text x="886" y="488">GND</text>
+    <line x1="850" y1="502" x2="880" y2="502" stroke="#7b1fa2" stroke-width="3"/><text x="886" y="506">motor drive</text>
   </g>
 </svg>

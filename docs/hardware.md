@@ -6,8 +6,8 @@ swab or a dish of vinegar as the source.
 
 ```
  gas sensor ──┐
- wind vane  ──┼── I²C ── Raspberry Pi ── Guide ── "Walk into the wind" / "Walk across…"
- IMU (yaw)  ──┘                                     (tones or vibration, see below)
+ wind vane  ──┼── I²C ── Raspberry Pi ── Guide ── cue ── I²C ── DRV2605L ── vibration motor
+ IMU (yaw)  ──┘                                                 (felt in the handle, see below)
 ```
 
 ## Prototype sketches
@@ -19,18 +19,21 @@ and why on the right.
 |---|---|
 | [![wiring schematic](schematic.svg)](schematic.svg) | [![physical layout](layout.svg)](layout.svg) |
 
-## Parts (~$60–80)
+## Parts (~$70 from Adafruit, plus a magnet)
 
 | part | what it does | I²C address | notes |
 |---|---|---|---|
-| **BME688** breakout (Adafruit or Pimoroni) | Gas resistance; falls as alcohol/VOCs rise | 0x76 or 0x77 (board-dependent) | Metal-oxide sensor with a seconds-scale response. The rise detector handles that (see below). |
-| **AS5600** magnetic angle sensor + diametric magnet | Reads the angle of a small wind vane | 0x36 (fixed) | Many cheap boards default to 5 V. Check that yours runs at 3.3 V before wiring it to the Pi. |
-| **BNO085** IMU breakout | Device heading (yaw) | 0x4A (or 0x4B) | Use the gyro-only "game rotation vector", not the compass: indoors, and next to the vane's magnet, a magnetometer is unreliable. |
-| Vibration motor or piezo buzzer | Feedback you don't have to read | GPIO | See *Feedback* below. |
-| STEMMA QT / Qwiic cables, jumper wires | Daisy-chain the I²C boards | | |
+| **BME688** breakout (Adafruit 5046, or Pimoroni) | Gas resistance; falls as alcohol/VOCs rise | 0x77 (Adafruit) / 0x76 (Pimoroni) | Metal-oxide sensor with a seconds-scale response. The rise detector handles that (see below). |
+| **AS5600** magnetic angle sensor (Adafruit 6357) + 6×2.5 mm **diametric** magnet | Reads the angle of a small wind vane | 0x36 (fixed) | The magnet is sold separately and must be diametrically magnetized. Generic boards often default to 5 V: set them to 3.3 V and tie DIR to GND. |
+| **BNO085** IMU breakout (Adafruit 4754) | Device heading (yaw) | 0x4A (or 0x4B) | Use the gyro-only "game rotation vector", not the compass: indoors, and next to the vane's magnet, a magnetometer is unreliable. |
+| **DRV2605L** haptic motor driver (Adafruit 2305) | Drives the vibration motor | 0x5A | Replaces a transistor + diode circuit. Built-in effect library and real-time playback for the cue patterns. |
+| Vibrating mini motor disc (Adafruit 1201) | The cue you feel | (on the DRV2605L's motor terminals) | ERM motor. See *Feedback* below. |
+| STEMMA QT cables: 1× to female sockets (4397), 3× 100 mm (4210) | Daisy-chain the I²C boards | | |
 | USB-C power bank | Makes it handheld | | |
 
-All three sensors have different addresses, so they share one I²C bus.
+All four boards have different addresses (0x36, 0x4A, 0x5A, 0x77), so they share one I²C bus.
+Where to buy, with prices and a cheaper mixed option, was researched in Oct 2026: the Adafruit
+parts above come to about $69 before shipping and the magnet.
 
 **Wind vane:** a light card or foam fin on a low-friction shaft, with the magnet glued to the
 shaft end 0.5–3 mm above the AS5600 chip. It has to swing reliably in ~1 m/s of fan air.
@@ -38,15 +41,16 @@ Making that work is the main mechanical job.
 
 ## Wiring
 
-Pi header I²C (bus 1): 3V3 → pin 1, SDA → pin 3, SCL → pin 5, GND → pin 6. Chain the three
-boards. The vibration motor needs a transistor (or a motor driver board) on a GPIO pin; don't
-drive it straight from the pin.
+Pi header I²C (bus 1): 3V3 → pin 1, SDA → pin 3, SCL → pin 5, GND → pin 6, using the cable
+with female sockets. From there, daisy-chain STEMMA QT cables: BME688 → BNO085 → AS5600 →
+DRV2605L. Solder or screw the motor's two leads to the DRV2605L's motor + and − terminals. No GPIO
+pin is used.
 
 Enable the header bus (it's off on this Pi today), then check that the boards show up:
 
 ```bash
 sudo raspi-config nonint do_i2c 0   # then reboot
-i2cdetect -y 1                      # expect 0x36, 0x4a and 0x76/0x77
+i2cdetect -y 1                      # expect 0x36, 0x4a, 0x5a and 0x77 (or 0x76)
 ```
 
 ## What the simulation already tells us
@@ -77,6 +81,10 @@ Because reaction time dominates, instructions should register without reading: f
 one buzz for "odor, go into the wind" and a left/right pattern for which way to cast. A screen
 or spoken text can show the details, but shouldn't be what you have to wait for.
 
+The DRV2605L plays the cue patterns from `hw/device.py` (`-` long, `.` short) over I²C, either
+by sequencing effects from its built-in library or with real-time playback, where the Pi sets the
+motor strength directly. Which one feels clearest is a test for when the parts arrive.
+
 ## Logging
 
 Every session can be saved with `--log session.csv`. The real device will use the same format,
@@ -86,12 +94,14 @@ the detector retuned, and the result compared with the simulation.
 
 ## Still to do when the parts arrive
 
-1. Drivers for the three sensors, each checked against the real chip (not written yet).
+1. Drivers for the three sensors and the DRV2605L, each checked against the real chip (not
+   written yet).
 2. Calibrate the vane zero against the device's forward direction, and the clean-air gas
    resistance.
 3. Measure the BME688's actual response time and achievable sample rate, then tune
    `RiseDetector.threshold` on real logs.
 4. A `surgecast guide --device` mode. The live loop is done (`hw/device.py`); this step adds a
-   `SensorSource` over the three drivers and a buzzer `Feedback` playing the existing cue patterns.
+   `SensorSource` over the three sensor drivers and a DRV2605L `Feedback` playing the existing cue
+   patterns.
 5. Possible issue: on older Pis, the BNO085 has trouble with I²C clock stretching. If it misbehaves on the
    Pi 5, lower the bus speed or use its UART-RVC mode.
