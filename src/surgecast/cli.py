@@ -68,6 +68,49 @@ def cmd_bench(args) -> int:
     return 0
 
 
+def cmd_guide(args) -> int:
+    from .hw.simdevice import DeviceSimConfig, run_device_episode
+
+    cfg = DeviceSimConfig(sensor_tau=args.sensor_tau, reaction=args.reaction)
+    if args.trials > 1:
+        runs = [run_device_episode(args.seed + s, cfg).result for s in range(args.trials)]
+        times = [r.time for r in runs if r.success]
+        med = f"{sorted(times)[len(times) // 2]:.1f}s" if times else "-"
+        print(f"simulated handheld guide: {len(times) / len(runs):.0%} found source, median {med} "
+              f"({args.trials} trials, sensor tau {args.sensor_tau}s, reaction {args.reaction}s)")
+        return 0
+
+    record_every = 0
+    if args.out:
+        record_every = 3 if args.out.endswith(".gif") else 1
+    run = run_device_episode(args.seed, cfg, record_every=record_every)
+    last = None
+    for ins in run.instructions:
+        if ins.state != last:
+            print(f"{ins.t:6.1f}s  {ins.state.upper():<7}  {ins.text}")
+            last = ins.state
+    res = run.result
+    outcome = f"reached the source in {res.time:.1f}s" if res.success else f"timed out at {res.time:.0f}s"
+    print(f"simulated walker {outcome}")
+    if args.log:
+        from .hw.log import write_csv
+
+        write_csv(args.log, run.readings, run.instructions)
+        print(f"wrote {args.log}")
+    if args.out:
+        try:
+            from . import render
+        except ImportError:
+            print("rendering needs matplotlib: pip install 'surgecast[render]'", file=sys.stderr)
+            return 1
+        if args.out.endswith(".gif"):
+            render.render_gif(res, args.out, record_every)
+        else:
+            render.render_png(res, args.out)
+        print(f"wrote {args.out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         prog="surgecast", description="Moth-style odor source search in a simulated turbulent plume."
@@ -87,6 +130,15 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--seed", type=int, default=0, help="first seed")
     _add_env_args(b)
     b.set_defaults(func=cmd_bench)
+
+    g = sub.add_parser("guide", help="handheld guide on a simulated device in an indoor fan plume")
+    g.add_argument("--seed", type=int, default=0)
+    g.add_argument("--trials", type=int, default=1, help=">1 prints a success summary instead")
+    g.add_argument("--sensor-tau", type=float, default=2.0, help="gas sensor response time, s")
+    g.add_argument("--reaction", type=float, default=0.7, help="walker reaction delay, s")
+    g.add_argument("--log", help="write readings and instructions to CSV")
+    g.add_argument("--out", help="write a .png plot or .gif animation")
+    g.set_defaults(func=cmd_guide)
 
     args = ap.parse_args(argv)
     return args.func(args)
