@@ -10,6 +10,15 @@ swab or a dish of vinegar as the source.
  IMU (yaw)  ──┘                                     (tones or vibration, see below)
 ```
 
+## Prototype sketches
+
+How everything combines into one handheld: the wiring on the left, and where each part sits
+and why on the right.
+
+| wiring | physical layout |
+|---|---|
+| [![wiring schematic](schematic.svg)](schematic.svg) | [![physical layout](layout.svg)](layout.svg) |
+
 ## Parts (~$60–80)
 
 | part | what it does | I²C address | notes |

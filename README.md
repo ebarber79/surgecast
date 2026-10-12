@@ -72,7 +72,8 @@ res.success, res.time, res.path
 
 The same logic, packaged as a device you carry: a gas sensor, a wind vane and an IMU tell it
 what you smell and which way the air moves, and it tells you which way to walk. Parts, wiring
-and what the simulation says about the design are in [`docs/hardware.md`](docs/hardware.md).
+and what the simulation says about the design are in [`docs/hardware.md`](docs/hardware.md),
+with a [wiring schematic](docs/schematic.svg) and a [layout sketch](docs/layout.svg).
 Until the parts arrive, `surgecast guide` runs the whole software path on a simulated device
 in an indoor fan plume, with a slow gas sensor and a person reacting to the instructions:
 
